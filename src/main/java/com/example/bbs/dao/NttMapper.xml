@@ -1,0 +1,281 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="com.example.bbs.dao.NttMapper">
+    
+    <select id="listNtt" resultType="com.example.bbs.dto.NttDTO" parameterType="com.example.bbs.dto.NttSerchDTO">
+		/** NttMapper.listNtt **/
+	  
+	  SELECT
+			  A.NTT_SEN
+			, A.AREA_SEN
+			, A.BBS_SEN
+			, A.PARENT_NTT_SEN
+			, A.ANNYMTY_FNCT_YN
+			, A.SCRTARTC_FNCT_YN
+			, A.DEL_YN
+			, A.HIDE_YN
+			, A.NOTICE_YN
+			, A.NCNM_NAE
+			, A.WRITER_NAM
+			, A.ANSWER_DEL_YN
+			, A.NTT_SUBJECT
+			, A.NTT_CONTENTS
+			, A.NTT_TEXT_CONTENTS
+			, IFNULL(B.NICE_NUM, 0) AS NICE_NUM
+			, IFNULL(B.UNNICE_NUM, 0) AS UNNICE_NUM
+			, IFNULL(C.SERCH_NUM, 0) AS SERCH_NUM
+			, IFNULL(D.ANSER_NUM, 0) AS ANSER_NUM
+			, A.INP_DT
+			, A.INP_ID
+			, A.UPD_DT
+			, A.UPD_ID
+		FROM ntt_mst A
+		LEFT OUTER JOIN (
+			SELECT 
+				NTT_SEN 
+				, SUM(IF(GDNICE_SEC = 'Y', 1, 0)) AS NICE_NUM
+				, SUM(IF(GDNICE_SEC = 'N', 1, 0)) AS UNNICE_NUM
+			FROM NTT_GDNICE_MST
+			GROUP BY NTT_SEN
+		) B ON A.NTT_SEN = B.NTT_SEN
+		LEFT OUTER JOIN (
+			SELECT 
+				NTT_SEN
+				,COUNT(*) AS SERCH_NUM
+			FROM NTT_SERCH_MST
+			GROUP BY NTT_SEN) C ON A.NTT_SEN = C.NTT_SEN
+		LEFT OUTER JOIN (
+			SELECT 
+				NTT_SEN
+				, COUNT(*) AS ANSER_NUM
+			FROM NTT_ANSER
+			GROUP BY NTT_SEN
+		) D ON A.NTT_SEN = D.NTT_SEN
+		WHERE AREA_SEN = #{areaSen}
+		AND BBS_SEN = #{bbsSen}
+    </select>
+    
+    <select id="getNtt" resultType="com.example.bbs.dto.NttDTO" parameterType="com.example.bbs.dto.NttSerchDTO">
+		/** NttMapper.getNtt **/
+	  
+	  SELECT
+			  A.NTT_SEN
+			, A.AREA_SEN
+			, A.BBS_SEN
+			, A.PARENT_NTT_SEN
+			, IFNULL(A.ANNYMTY_FNCT_YN, 'N') AS ANNYMTY_FNCT_YN
+			, IFNULL(A.SCRTARTC_FNCT_YN, 'N') AS SCRTARTC_FNCT_YN
+			, A.DEL_YN
+			, A.HIDE_YN
+			, A.NOTICE_YN
+			, A.NCNM_NAE
+			, A.WRITER_NAM
+			, A.ANSWER_DEL_YN
+			, A.NTT_SUBJECT
+			, A.NTT_CONTENTS
+			, A.NTT_TEXT_CONTENTS
+			, IFNULL(B.NICE_NUM, 0) AS NICE_NUM
+			, IFNULL(B.UNNICE_NUM, 0) AS UNNICE_NUM
+			, IFNULL(C.SERCH_NUM, 0) AS SERCH_NUM
+			, IFNULL(D.ANSER_NUM, 0) AS ANSER_NUM
+			, A.INP_DT
+			, A.INP_ID
+			, A.UPD_DT
+			, A.UPD_ID
+		FROM ntt_mst A
+		LEFT OUTER JOIN (
+			SELECT 
+				NTT_SEN 
+				, SUM(IF(GDNICE_SEC = 'Y', 1, 0)) AS NICE_NUM
+				, SUM(IF(GDNICE_SEC = 'N', 1, 0)) AS UNNICE_NUM
+			FROM NTT_GDNICE_MST
+			GROUP BY NTT_SEN
+		) B ON A.NTT_SEN = B.NTT_SEN
+		LEFT OUTER JOIN (
+			SELECT 
+				NTT_SEN
+				,COUNT(*) AS SERCH_NUM
+			FROM NTT_SERCH_MST
+			GROUP BY NTT_SEN) C ON A.NTT_SEN = C.NTT_SEN
+		LEFT OUTER JOIN (
+			SELECT 
+				NTT_SEN
+				, COUNT(*) AS ANSER_NUM
+			FROM NTT_ANSER
+			GROUP BY NTT_SEN
+		) D ON A.NTT_SEN = D.NTT_SEN
+		WHERE AREA_SEN = #{areaSen}
+		AND BBS_SEN = #{bbsSen}
+		AND A.NTT_SEN = #{nttSen}
+    </select>
+    
+    <insert id="insertNttMst" parameterType="com.example.bbs.dto.NttDTO">
+		/** NttMapper.insertNttMst **/
+		
+		insert into NTT_MST
+		(
+			  AREA_SEN
+			, BBS_SEN
+			, PARENT_NTT_SEN
+			, ANNYMTY_FNCT_YN
+			, SCRTARTC_FNCT_YN
+			, DEL_YN
+			, HIDE_YN
+			, NOTICE_YN
+			, NCNM_NAE
+			, WRITER_NAM
+			, ANSWER_DEL_YN
+			, NTT_SUBJECT
+			, NTT_CONTENTS
+			, NTT_TEXT_CONTENTS
+			, INP_ID
+		)
+		VALUES
+		(
+			#{areaSen}
+			, #{bbsSen}
+			, #{parentNttSen}
+			, #{annymtyFnctYn}
+			, #{scrtartcFnctYn}
+			, #{delYn}
+			, #{hideYn}
+			, #{noticeYn}
+			, #{ncnmNae}
+			, #{writerNam}
+			, #{answerDelYn}
+			, #{nttSubject}
+			, #{nttContents}
+			, #{nttTextContents}
+			, #{inpId}
+		)
+		
+	</insert>
+	
+	<update id="updateNttMst" parameterType="com.example.bbs.dto.NttDTO">
+		/** NttMapper.updateNttMst **/
+		UPDATE NTT_MST SET
+			  ANNYMTY_FNCT_YN = #{annymtyFnctYn}
+			, SCRTARTC_FNCT_YN = #{scrtartcFnctYn}
+			, DEL_YN = #{delYn}
+			, HIDE_YN = #{hideYn}
+			, NOTICE_YN = #{noticeYn}
+			, ANSWER_DEL_YN = #{answerDelYn}
+			, NTT_SUBJECT = #{nttSubject}
+			, NTT_CONTENTS = #{nttContents}
+			, NTT_TEXT_CONTENTS = #{nttTextContents}
+			, UPD_DT = NOW()
+			, UPD_ID = #{updId}
+		WHERE NTT_SEN = #{nttSen}
+		
+	</update>
+	
+	<insert id="insertNttGdniceMst" parameterType="com.example.bbs.dto.NttDTO">
+		/** NttMapper.insertNttMst **/
+		
+		INSERT INTO NTT_GDNICE_MST (
+			  USER_ID
+			, NTT_SEN
+			, USE_YN
+			, GDNICE_SEC
+			, INP_ID
+		)
+		VALUES
+		(
+			  #{userId}
+			, #{nttSen}
+			, #{useYn}
+			, #{gdniceSec}
+			, #{inpId}
+		)
+		
+	</insert>
+	
+	<insert id="insertNttSerchMst" parameterType="com.example.bbs.dto.NttDTO">
+		/** NttMapper.insertNttMst **/
+		
+		INSERT INTO NTT_SERCH_MST 
+		(
+			  USER_ID
+			, NTT_SEN
+			, IP_ADDR
+			, INP_ID
+		)
+		VALUES
+		(
+			  #{userId}
+			, #{nttSen}
+			, #{ipAddr}
+			, #{inpId}
+		)
+	</insert>
+	
+	<select id="getNttSerchMst" parameterType="com.example.bbs.dto.NttSerchDTO" resultType="String">
+		/** NttMapper.getNttSerchMst **/
+		SELECT IF(COUNT(*) > 0, 'Y', 'N') AS EXISTS_YN
+		FROM NTT_SERCH_MST
+		WHERE NTT_SEN = #{nttSen}
+		AND IP_ADDR = #{ipAddr}
+		
+	</select>
+	
+	<insert id="insertAnser" parameterType="com.example.bbs.dto.AnserDTO">
+		/** NttMapper.insertAnser **/
+		
+		INSERT INTO NTT_ANSER
+		(
+			  PARENT_ANSER_SEN
+			, NTT_SEN
+			, WRITER_NAM
+			, ANSER_CONTENTS
+			, INP_ID
+		)
+		VALUES
+		(
+			  #{parentAnserSen}
+			, #{nttSen}
+			, #{writerNam}
+			, #{anserContents}
+			, #{inpId}
+		)
+		
+	</insert>
+	
+	<select id="listAnser" resultType="com.example.bbs.dto.AnserDTO" parameterType="com.example.bbs.dto.AnserDTO">
+		/** NttMapper.listAnser **/
+		WITH RECURSIVE cte AS (
+		  SELECT
+		    ANSER_SEN,
+		    PARENT_ANSER_SEN,
+		    ANSER_CONTENTS,
+		    ANSER_SEN AS SORT,
+			WRITER_NAM,
+			DATE_FORMAT(INP_DT, '%Y.%m.%d %H:%i') AS INP_DT,
+		    0 AS LV
+		  FROM
+		    NTT_ANSER
+		  WHERE
+		    NTT_SEN = #{nttSen} 
+		    AND PARENT_ANSER_SEN = 0
+		    
+		  UNION ALL
+		  
+		  SELECT
+		    n.ANSER_SEN,
+		    n.PARENT_ANSER_SEN,
+		    n.ANSER_CONTENTS,
+		    cte.SORT,
+			n.WRITER_NAM,
+			DATE_FORMAT(n.INP_DT, '%Y.%m.%d %H:%i') AS INP_DT,
+		    cte.LV + 1
+		  FROM
+		    NTT_ANSER n
+		    INNER JOIN cte
+		      ON n.PARENT_ANSER_SEN = cte.ANSER_SEN
+		)
+		SELECT * FROM cte
+		ORDER BY SORT, LV, ANSER_SEN;
+	</select>
+</mapper>

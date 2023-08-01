@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="com.example.bbs.dao.BbsMapper">
+    
+    <select id="listBbsMst" resultType="com.example.bbs.dto.BbsDTO">
+		/** BbsMapper.listBbsMst **/
+	  SELECT
+			  BBS_SEN 
+			, BBS_TY_CD
+			, FS_CMMN_CD_NAE(BBS_TY_CD) BBS_TY_NAE
+			, BBS_NAE
+			, BBS_DESCRIPT
+			, SORT_ORD
+			, DATE_FORMAT(INP_DT, '%Y-%m-%d') AS INP_DT
+		FROM BBS_MST
+    </select>
+    
+    
+    <select id="getBoard" resultType="com.example.bbs.dto.BbsDTO" parameterType="String">
+		/** BbsMapper.getBoard **/ 
+		SELECT
+			  A.BBS_SEN 
+			, A.PARENT_BBS_SEN
+			, A.BBS_TY_CD
+			, A.BBS_NAE
+			, A.BBS_DESCRIPT
+			, A.SORT_ORD
+			, B.OPTN_SEN
+			, IFNULL(B.GDNICE_USE_YN, 'N') as GDNICE_USE_YN 
+			, B.GDNICE_SCR
+			, B.GDNICE_UPP_NUM
+			, IFNULL(B.SCRTARTC_FNCT_YN, 'N') AS SCRTARTC_FNCT_YN
+			, IFNULL(B.ANSER_FNCT_YN, 'N') AS ANSER_FNCT_YN
+			, IFNULL(B.ANSWER_FNCT_YN, 'N') AS ANSWER_FNCT_YN
+			, IFNULL(B.ANNYMTY_FNCT_YN, 'N') AS ANNYMTY_FNCT_YN
+			, IFNULL(B.STTEMNT_FNCT_YN, 'N') AS STTEMNT_FNCT_YN
+			, B.STTEMNT_FNCT_TS_NUM
+		FROM BBS_MST A
+		LEFT OUTER JOIN BBS_OPTN B ON A.BBS_SEN = B.BBS_SEN
+		WHERE A.BBS_SEN = #{bbsSen}
+	</select>
+	
+	<insert id="insertBbsMst" parameterType="com.example.bbs.dto.BbsDTO">
+		/** BbsMapper.insertBbsMst **/ 
+		INSERT INTO BBS_MST
+		(
+			  PARENT_BBS_SEN
+			, BBS_TY_CD
+			, BBS_NAE
+			, BBS_DESCRIPT
+			, SORT_ORD
+			, INP_ID
+		)
+		VALUES
+		(
+			  #{parentBbsSen}
+			, #{bbsTyCd}
+			, #{bbsNae}
+			, #{bbsDescript}
+			, #{sortOrd}
+			, #{inpId}
+		)
+		<selectKey resultType="int" keyProperty="bbsSen" order="AFTER">
+			SELECT MAX(BBS_SEN) AS bbsSen
+			FROM BBS_MST
+		</selectKey>
+	</insert>
+	
+	<update id="updateBbsMst" parameterType="com.example.bbs.dto.BbsDTO">
+		/** BbsMapper.updateBbsMst **/
+		
+		UPDATE BBS_MST SET
+			BBS_TY_CD = #{bbsTyCd}
+			, BBS_NAE = #{bbsNae}
+			, BBS_DESCRIPT = #{bbsDescript}
+			, SORT_ORD = #{sortOrd}
+			, UPD_ID = #{updId}
+			, UPD_DT = NOW()
+		WHERE BBS_SEN = #{bbsSen} 
+		
+	</update>
+	
+	<insert id="insertBbsOptn" parameterType="com.example.bbs.dto.BbsDTO">
+		/** BbsMapper.insertBbsOptn **/ 
+		INSERT INTO BBS_OPTN
+		(
+			  BBS_SEN
+			, GDNICE_USE_YN
+			, GDNICE_SCR
+			, GDNICE_UPP_NUM
+			, SCRTARTC_FNCT_YN
+			, ANSER_FNCT_YN
+			, ANSWER_FNCT_YN
+			, ANNYMTY_FNCT_YN
+			, STTEMNT_FNCT_YN
+			, STTEMNT_FNCT_TS_NUM
+			, INP_ID
+		)
+		VALUES
+		(
+			  #{bbsSen}
+			, #{gdniceUseYn}
+			, #{gdniceScr}
+			, #{gdniceUppNum}
+			, #{scrtartcFnctYn}
+			, #{anserFnctYn}
+			, #{answerFnctYn}
+			, #{annymtyFnctYn}
+			, #{sttemntFnctYn}
+			, #{sttemntFnctTsNum}
+			, #{inpId}
+		)
+		
+		<selectKey resultType="int" keyProperty="optnSen" order="AFTER">
+			SELECT MAX(OPTN_SEN) AS optnSen
+			FROM BBS_OPTN
+		</selectKey>
+	</insert>
+	
+	<update id="updateBbsOptn" parameterType="com.example.bbs.dto.BbsDTO">
+		/** BbsMapper.updateBbsOptn **/
+		
+		UPDATE BBS_OPTN SET
+			  GDNICE_USE_YN = #{gdniceUseYn}
+			, GDNICE_SCR = #{gdniceScr}
+			, GDNICE_UPP_NUM = #{gdniceUppNum}
+			, SCRTARTC_FNCT_YN = #{scrtartcFnctYn}
+			, ANSER_FNCT_YN = #{anserFnctYn}
+			, ANSWER_FNCT_YN = #{answerFnctYn}
+			, ANNYMTY_FNCT_YN = #{annymtyFnctYn}
+			, STTEMNT_FNCT_YN = #{sttemntFnctYn}
+			, STTEMNT_FNCT_TS_NUM = #{sttemntFnctTsNum}
+			, UPD_ID = #{updId}
+			, UPD_DT = NOW()
+		WHERE BBS_SEN = #{bbsSen}
+		AND OPTN_SEN = #{optnSen}
+		
+	</update>
+	
+	<delete id="deleteBbsMst" parameterType="String">
+		/** BbsMapper.deleteBbsMst **/
+		DELETE FROM BBS_MST
+		WHERE BBS_SEN = #{bbsSen}
+	</delete>
+	
+	<delete id="deleteBbsOptn" parameterType="String">
+		/** BbsMapper.deleteBbsMst **/
+		DELETE FROM BBS_OPTN
+		WHERE OPTN_SEN = #{optnSen}
+		
+	</delete>
+	
+	<select id="listAreaMst" resultType="com.example.bbs.dto.AreaDTO">
+		/** BbsMapper.deleteBbsMst **/
+		
+		SELECT 
+			AREA_SEN
+			, AREA_NAE
+			, AREA_DESCRIPT
+			, USE_YN
+			, SORT_ORD
+			, DATE_FORMAT(INP_DT, '%Y-%m-%d') AS INP_DT
+		FROM AREA_MST
+		
+	</select>
+    
+    
+    <select id="getArea" resultType="com.example.bbs.dto.AreaDTO" parameterType="String">
+		/** BbsMapper.getArea **/ 
+		SELECT
+			  AREA_SEN 
+			, AREA_NAE
+			, AREA_DESCRIPT
+			, SORT_ORD
+			, USE_YN
+		FROM AREA_MST
+		WHERE AREA_SEN = #{areaSen}
+	</select>
+	
+	<insert id="insertAreaMst" parameterType="com.example.bbs.dto.AreaDTO">
+		/** BbsMapper.insertAreaMst **/ 
+		INSERT INTO AREA_MST
+		(
+			  AREA_NAE
+			, AREA_DESCRIPT
+			, SORT_ORD
+			, USE_YN
+			, INP_ID
+		)
+		VALUES
+		(
+			  #{areaNae}
+			, #{areaDescript}
+			, #{sortOrd}
+			, #{useYn}
+			, #{inpId}
+		)
+		<selectKey resultType="int" keyProperty="areaSen" order="AFTER">
+			SELECT MAX(AREA_SEN) AS areaSen
+			FROM AREA_MST
+		</selectKey>
+	</insert>
+	
+	<update id="updateAreaMst" parameterType="com.example.bbs.dto.AreaDTO">
+		/** BbsMapper.updateAreaMst **/
+		
+		UPDATE AREA_MST SET
+			  AREA_NAE = #{areaNae}
+			, AREA_DESCRIPT = #{areaDescript}
+			, SORT_ORD = #{sortOrd}
+			, USE_YN = #{useYn}
+			, UPD_ID = #{updId}
+			, UPD_DT = NOW()
+		WHERE AREA_SEN = #{areaSen} 
+		
+	</update>
+	
+	<delete id="deleteAreaMst" parameterType="String">
+		/** BbsMapper.deleteAreaMst **/
+		DELETE FROM AREA_MST
+		WHERE AREA_SEN = #{areaSen}
+	</delete>
+</mapper>
