@@ -32,7 +32,7 @@
 			, A.INP_ID
 			, A.UPD_DT
 			, A.UPD_ID
-		FROM ntt_mst A
+		FROM NTT_MST A
 		LEFT OUTER JOIN (
 			SELECT 
 				NTT_SEN 
@@ -85,7 +85,7 @@
 			, A.INP_ID
 			, A.UPD_DT
 			, A.UPD_ID
-		FROM ntt_mst A
+		FROM NTT_MST A
 		LEFT OUTER JOIN (
 			SELECT 
 				NTT_SEN 
@@ -115,7 +115,7 @@
     <insert id="insertNttMst" parameterType="com.example.bbs.dto.NttDTO">
 		/** NttMapper.insertNttMst **/
 		
-		insert into NTT_MST
+		INSERT INTO NTT_MST
 		(
 			  AREA_SEN
 			, BBS_SEN
@@ -245,7 +245,7 @@
 	
 	<select id="listAnser" resultType="com.example.bbs.dto.AnserDTO" parameterType="com.example.bbs.dto.AnserDTO">
 		/** NttMapper.listAnser **/
-		WITH RECURSIVE cte AS (
+		WITH RECURSIVE CTE AS (
 		  SELECT
 		    ANSER_SEN,
 		    PARENT_ANSER_SEN,
@@ -266,16 +266,16 @@
 		    n.ANSER_SEN,
 		    n.PARENT_ANSER_SEN,
 		    n.ANSER_CONTENTS,
-		    cte.SORT,
+		    CTE.SORT,
 			n.WRITER_NAM,
 			DATE_FORMAT(n.INP_DT, '%Y.%m.%d %H:%i') AS INP_DT,
-		    cte.LV + 1
+		    CTE.LV + 1
 		  FROM
 		    NTT_ANSER n
-		    INNER JOIN cte
-		      ON n.PARENT_ANSER_SEN = cte.ANSER_SEN
+		    INNER JOIN CTE
+		      ON n.PARENT_ANSER_SEN = CTE.ANSER_SEN
 		)
-		SELECT * FROM cte
+		SELECT * FROM CTE
 		ORDER BY SORT, LV, ANSER_SEN;
 	</select>
 </mapper>
