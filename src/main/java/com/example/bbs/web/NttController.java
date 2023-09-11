@@ -42,7 +42,6 @@ public class NttController {
 	@PostMapping("/save")
 	public ResponseEntity<Void> saveNtt(@RequestBody NttDTO nttDTO) {
 		
-		System.out.println(nttDTO);
 		nttService.saveNtt(nttDTO);
 		
 		return ResponseEntity.noContent().build();

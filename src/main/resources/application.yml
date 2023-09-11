@@ -3,16 +3,16 @@ server:
   port: 8080
 
 spring:
+  servlet:
+    multipart:
+      max-file-size: 30MB
+      max-request-size: 100MB
 #  application:
 #    name: bbs
 #  config:
 #    import:
 #      - optional:classpath:common.yml
 #      - optional:classpath:common-override.yml
-#    servlet:
-#      multipart:
-#        max-file-size: 30MB
-#        max-request-size: 100MB
   devtools:
     livereload:
       enabled: true

@@ -4,6 +4,9 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,7 +39,21 @@ public class NttServiceImpl implements NttService{
 	@Override
 	public List<NttDTO> listNtt(NttSerchDTO nttSerchDTO) {
 		// TODO Auto-generated method stub
-		return nttMapper.listNtt(nttSerchDTO);
+		
+		List<NttDTO> list = nttMapper.listNtt(nttSerchDTO);
+		
+		for (NttDTO dto : list) {
+			Document document = Jsoup.parse(dto.getNttContents());
+	        Element firstImgElement = document.select("img[src]").first(); // 첫 번째 img 태그 선택
+
+	        if (firstImgElement != null) {
+	            String srcValue = firstImgElement.attr("src");
+	            dto.setNttSrc(srcValue);
+	        } else {
+	            System.out.println("No image found!");
+	        }
+		}
+		return list;
 	}
 
 	@Transactional()

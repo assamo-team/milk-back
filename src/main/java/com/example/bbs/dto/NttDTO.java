@@ -47,6 +47,9 @@ public class NttDTO {
 	@Schema(description = "게시물텍스트내용", example = "")
 	private String nttTextContents;
 	
+	@Schema(description = "게시물이미지", example = "")
+	private String nttSrc;
+	
 	@Schema(description = "좋아요갯수", example = "")
 	private String niceNum;
 	
